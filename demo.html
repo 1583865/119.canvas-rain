@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>canvas下雨</title>
+	<link rel="stylesheet" type="text/css" href="./demo.css">
+</head>
+<body>
+	
+	<canvas class="rain">
+		
+	</canvas>
+
+<script type="text/javascript">
+// 语言掌握
+// 项目思维
+// 兼容性问题都出现在dom和bom上
+
+// 1.让canvas元素和浏览器窗口宽高一致
+// 获取canvas元素
+// 获取浏览器窗口宽高，存起来
+// canvas设置宽高
+// 当浏览器窗口宽高发生改变时重新设置canvas的宽高
+
+//2. 绘制图形
+   /*
+	绘制圆形
+	绘制矩形
+	获取canvas元素可绘制区域
+	拿起笔蘸上墨水
+	//想象绘制图形
+	//下笔  fill实心  stroke虚心
+   */
+   	// canCon.arc(233,233,66,0,Math.PI*2);//想象画一个圆
+/*3.绘制会动的图形
+   	动画：1s 播放多张静态页面
+   	帧 画面中物体的状态（位置 形状 大小 颜色）
+   	1s内画60帧   1/60s定时器
+   	会动的雨滴
+
+
+   	*/
+
+/*
+4。绘制会动的雨滴
+*/
+/*
+5.绘制250个雨滴  每个0.2s一滴雨滴
+*/
+
+/*<!-- 面向对象
+	人：
+	DNA：生物是人
+	基因
+	表达
+
+	FOR循环  可复用性  封装雨滴
+
+
+ -->*/
+
+
+
+
+
+// 1.获取canvas元素
+var canvas = document.querySelector(".rain");
+
+// 2.获取浏览器宽高,存起来
+var w,h;
+
+
+// 3.封装浏览器宽高
+(function setSize(){
+	window.onresize=arguments.callee;
+	w = window.innerWidth;//浏览器宽
+    h = window.innerHeight;//浏览器高
+    canvas.width=w;
+    canvas.height=h;
+})();
+
+// 4.封装可绘制区域
+var canCon = canvas.getContext("2d");//获取canvas元素可绘制区域
+var aRain=[];//存放小雨滴
+
+
+// 定时加载动画
+var y=0;
+
+//随机数  从最小值到最大值
+function random(min,max){
+	return Math.random()*(max-min)+min;
+
+}
+
+
+// 创造雨
+//雨的dna 构造函数
+function Rain() {
+
+};
+
+// 基因
+Rain.prototype={
+	init:function(){
+		this.x=random(0,w);//从0到w 新生成雨滴x位置
+		this.y=0;//新生成雨滴y位置
+		this.vY=random(4,5);//雨滴每秒钟下降速度
+		this.h=random(0.8*h,0.9*h);//雨滴下降高度
+		this.r=1;//圆的初始半径
+		this.vr=1;//雨滴半径扩大的速度
+	},
+	//绘制雨滴
+	draw:function(){
+		if(this.y<this.h){
+		canCon.beginPath();//笔抬起来
+		canCon.fillStyle="lightblue";//拿起笔蘸上墨水
+		canCon.fillRect(this.x,this.y,4,10);//想象画一个矩形
+	}else {
+		canCon.beginPath();//笔抬起来
+		canCon.strokeStyle="lightblue";//拿起笔蘸上墨水
+		canCon.arc(this.x,this.y,this.r,0,Math.PI*2);//想象画一个矩形
+		canCon.stroke();//下笔作画
+
+	}
+	},
+	move:function(){
+		if(this.y<this.h){
+			this.y+=this.vY;//雨滴每秒下降4,5
+		}else {
+			if(this.r<80){
+				this.r+=this.vr;
+			}else {
+				this.init();
+			}//判断雨滴落下的圆大小
+		}
+		this.draw();//把移动的雨画出来
+	}
+};
+	
+
+// 封装雨滴
+function createRain(num){
+	for(var i = 0; i<num;i++){
+		setTimeout(function(){
+			var rain=new Rain();//根据雨的dna创造一个新雨滴
+			// 有了基因得表达出来
+			rain.init();
+			rain.draw();
+			aRain.push(rain);
+		},200*i);//延时器	
+	}
+}
+createRain(100);
+
+
+// 设置定时器添加蒙版
+setInterval(function(){
+	// 蒙版
+	canCon.fillStyle="rgba(0,0,0,0.05)";
+	canCon.fillRect(0,0,w,h);//添加蒙版  下笔
+	for(var item of aRain){
+		//for of: item变量指的是数组里面的每一个元素
+		//for in: item变量指的是数组里面的每一个下标（包括圆形链上可遍历的元素）
+		item.move();
+	}
+},1000/60);//每个t ms执行一次function
+</script>
+</body>
+</html>
+
